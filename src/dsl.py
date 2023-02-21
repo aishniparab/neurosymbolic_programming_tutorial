@@ -1,11 +1,8 @@
 """
-stopped working at 02-07-2023 11:05am
 Need to fix:
-* bool type
 * return list of objects as an object set with the correct indices
+* might need to implement relation as a datatype: left, right, behind, in front
 """
-
-
 class ClevrObject:
     def __init__(self, image_filename, object_idx, pixel_coords, three_d_coords, rotation, size, color, shape,
                  material):
@@ -25,6 +22,18 @@ class ClevrObject:
             'shape': ["cube", "sphere", "cylinder"],
             'material': ["rubber", "metal"]
         }
+
+    def set_attr(self, attr_name, attr):
+        if attr_name.lower() == "size":
+                self.size = attr
+        elif attr_name.lower() == "color":
+                self.color = attr
+        elif attr_name.lower() == "shape":
+                self.shape = attr
+        elif attr_name.lower() == "material":
+                self.material = attr
+        else:
+            return "Invalid attribute"
 
     def get_attr(self, x):
         """
@@ -54,10 +63,52 @@ class ClevrScene:
         self.image_filename = scene_graph['image_filename']
         self.ObjectSet = ClevrObjectSet(self.image_filename, scene_graph['objects'])
 
+class Boolean:
+    def __init__(self, term):
+        self.value_space = {
+            'true': 'yes',
+            True: 'yes',
+            'True': 'yes',
+            '1': 'yes',
+            False: 'no',
+            'false': 'no',
+            'False': 'no',
+            '0': 'no'
+        }
+        self.value = self.value_space[term]
+class Integer:
+    def __init__(self, term):
+        self.value_space = {
+            '0': 0,
+            'zero': 0,
+            '1': 1,
+            'one': 1,
+            '2': 2,
+            'two': 2,
+            '3': 3,
+            'three': 3,
+            '4': 4,
+            'four': 4,
+            '5': 5,
+            'five': 5,
+            '6': 6,
+            'six': 6,
+            '7': 7,
+            'seven': 7,
+            '8': 8,
+            'eight': 8,
+            '9': 9,
+            'nine': 9,
+            '10': 10,
+            'ten': 10
+        }
+        self.value = self.value_space[term]
 
 class ClevrDSL:
     def __init__(self, image_idx, scene_graph):
         self.this_scene = ClevrScene(scene_graph)
+        self.yes = Boolean(True).value
+        self.no = Boolean(False).value
 
     def scene(self):
         """
@@ -96,16 +147,15 @@ class ClevrDSL:
         """
         return obj_set.size
 
-    @staticmethod
-    def exist(obj_set):
+    def exist(self, obj_set):
         """
         :param obj_set: ClevrObjectSet()
         :return: boolean: Yes if input is non-empty, No otherwise
         """
         if obj_set.size > 0:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
     @staticmethod
     def filter_size(obj_set, size):
@@ -237,86 +287,79 @@ class ClevrDSL:
                        o.shape == this_obj_shape and o.object_idx != obj.object_idx]
         return ret_obj_set
 
-    @staticmethod
-    def equal_integer(int_1, int_2):
+    def equal_integer(self, int_1, int_2):
         """
         :param int_1: Integer
         :param int_2: Integer
         :return: Boolean: Yes if the two are equal, No otherwise
         """
         if int_1 == int_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def less_than(int_1, int_2):
+    def less_than(self, int_1, int_2):
         """
         :param int_1: Integer
         :param int_2: Integer
         :return: Boolean: Yes if the first input is less than the second
         """
         if int_1 < int_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def greater_than(int_1, int_2):
+    def greater_than(self, int_1, int_2):
         """
         :param int_1: Integer
         :param int_2: Integer
         :return: Boolean: Yes if the first input is greater than the second
         """
         if int_1 > int_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def equal_size(size_1, size_2):
+    def equal_size(self, size_1, size_2):
         """
         :param size_1: String
         :param size_2: String
         :return: Boolean: Yes if the two are equal
         """
         if size_1 == size_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def equal_material(material_1, material_2):
+    def equal_material(self, material_1, material_2):
         """
         :param material_1: String
         :param material_2: String
         :return: Boolean: Yes if the two are equal
         """
         if material_1 == material_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def equal_color(color_1, color_2):
+    def equal_color(self, color_1, color_2):
         """
         :param color_1: String
         :param color_2: String
         :return: Yes if the two are equal
         """
         if color_1 == color_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
 
-    @staticmethod
-    def equal_shape(shape_1, shape_2):
+    def equal_shape(self, shape_1, shape_2):
         """
         :param shape_1: String
         :param shape_2: String
         :return: Yes if the two are equal
         """
         if shape_1 == shape_2:
-            return True
+            return self.yes
         else:
-            return False
+            return self.no
