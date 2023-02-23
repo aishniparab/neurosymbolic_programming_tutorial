@@ -1,55 +1,67 @@
 """
 Need to fix:
 * return list of objects as an object set with the correct indices
-* might need to implement relation as a datatype: left, right, behind, in front
+* refactor objectset
 """
-class ClevrObject:
-    def __init__(self, image_filename, object_idx, pixel_coords, three_d_coords, rotation, size, color, shape,
-                 material):
-        self.image_idx = image_filename
-        self.object_idx = object_idx  # in the scene
-        self.pixel_coords = pixel_coords
-        self.three_d_coords = three_d_coords
-        self.rotation = rotation
-        self.size = size
-        self.color = color
-        self.shape = shape
-        self.material = material
+class ClevrObject: # data type
+    def __init__(self):
+        #, image_filename, object_idx, pixel_coords, three_d_coords, rotation, size, color, shape,
+        #         material):
+        self.image_idx = None #image_filename
+        self.object_idx = None #object_idx  # in the scene
+        self.pixel_coords = None #pixel_coords
+        self.three_d_coords = None #three_d_coords
+        self.rotation = None #rotation
+        self.size = None #size
+        self.color = None #color
+        self.shape = None #shape
+        self.material = None #material
+
+    def set_attr(self, attr_name, attr):
+        if attr_name.lower() == "size":
+            self.size = Size(attr)
+        elif attr_name.lower() == "color":
+            self.color = Color(attr)
+        elif attr_name.lower() == "shape":
+            self.shape = Shape(attr)
+        elif attr_name.lower() == "material":
+            self.material = Material(attr)
+        elif attr_name == "image_idx":
+            self.image_idx = attr
+        elif attr_name == "object_idx":
+            self.object_idx = attr
+        elif attr_name == "pixel_coords":
+            self.pixel_coords = attr
+        elif attr_name == "three_d_coords":
+            self.three_d_coords = attr
+        elif attr_name == "rotation":
+            self.rotation == attr
+        else:
+            return "Invalid attribute"
+
+    @staticmethod
+    def get_attr(input_string):
+        """
+        :param x: string: an object attribute such as "small" or "sphere"
+        :return: string: name of the attribute category it belongs to such as "size" or "shape"
+        """
         # space of object attribute defined in the DSL
-        self.attribute_space = {
+        attribute_space = {
             'size': ["small", "large"],
             'color': ["gray", "red", "blue", "green", "brown", "purple", "cyan", "yellow"],
             'shape': ["cube", "sphere", "cylinder"],
             'material': ["rubber", "metal"]
         }
+        return [k for k, v in attribute_space.items() if input_string in v][0]
 
-    def set_attr(self, attr_name, attr):
-        if attr_name.lower() == "size":
-                self.size = attr
-        elif attr_name.lower() == "color":
-                self.color = attr
-        elif attr_name.lower() == "shape":
-                self.shape = attr
-        elif attr_name.lower() == "material":
-                self.material = attr
-        else:
-            return "Invalid attribute"
-
-    def get_attr(self, x):
-        """
-        :param x: string: an object attribute such as "small" or "sphere"
-        :return: string: name of the attribute category it belongs to such as "size" or "shape"
-        """
-        return [k for k, v in self.attribute_space.items() if x in v][0]
-
-
-class ClevrObjectSet:
+"""
+class ClevrObjectSet: # data type
     def __init__(self, image_filename, scene_objects):
         self.objects = [
             ClevrObject(image_filename, obj_idx, obj['pixel_coords'], obj['3d_coords'], obj['rotation'], obj['size'],
                         obj['color'], obj['shape'], obj['material']) for obj_idx, obj in enumerate(scene_objects)]
         self.size = len(scene_objects)
-
+"""
 
 class ClevrScene:
     # input is a single scene
@@ -63,9 +75,9 @@ class ClevrScene:
         self.image_filename = scene_graph['image_filename']
         self.ObjectSet = ClevrObjectSet(self.image_filename, scene_graph['objects'])
 
-class Boolean:
+class Boolean: # data type
     def __init__(self, term):
-        self.value_space = {
+        self.boolean_space = {
             'true': 'yes',
             True: 'yes',
             'True': 'yes',
@@ -75,10 +87,13 @@ class Boolean:
             'False': 'no',
             '0': 'no'
         }
-        self.value = self.value_space[term]
-class Integer:
+        if term in self.boolean_space:
+            self.value = self.value_space[term]
+        else:
+            return "Boolean undefined in vocabulary"
+class Integer: # data type
     def __init__(self, term):
-        self.value_space = {
+        self.integer_space = {
             '0': 0,
             'zero': 0,
             '1': 1,
@@ -102,8 +117,64 @@ class Integer:
             '10': 10,
             'ten': 10
         }
-        self.value = self.value_space[term]
+        if term in self.integer_space:
+            self.value = self.integer_space[term]
+        else:
+            return "Integer undefined in vocabulary"
 
+class Color: #value type
+    def __init__(self, term):
+        self.color_space = {'blue', 'red', 'green', 'cyan', 'gray', 'brown', 'purple', 'yellow'}
+        if term in self.color_space:
+            self.value = term
+        else:
+            return "Color undefined in vocabulary"
+
+class Size: #value type
+    def __init__(self, term):
+        self.size_space = {
+            'large': 'large', 'big': 'large',
+            'small': 'small', 'tiny': 'small'}
+        if term in self.size_space:
+            self.value = self.size_space[term]
+        else:
+            return "Size undefined in vocabulary"
+
+class Material: #value type
+    def __init__(self, term):
+        self.material_space = {
+            'metal': 'metal', 'shiny': 'metal', 'metallic': 'metal',
+            'rubber': 'rubber', 'matte': 'rubber'}
+        if term in self.material_space:
+            self.value = self.material_space[term]
+        else:
+            "Material undefined in vocabulary"
+
+class Shape: #value type
+    def __init__(self, term):
+        self.shape_space = {
+            'cube': 'cube', 'block': 'cube',
+            'sphere': 'sphere', 'ball': 'sphere',
+            'cylinder': 'cylinder'
+        }
+        if term in self.shape_space:
+            self.value = self.shape_space[term]
+        else:
+            "Shape undefined in vocabulary"
+class Relation: #value type
+    def __init__(self, term):
+        self.relation_space = {
+            'front': 'front', 'in front of': 'front',
+            'behind': 'behind',
+            'right': 'right', 'right of': 'right', 'to the right of': 'right', 'on the right side of': 'right',
+            'left': 'left', 'left of': 'left', 'to the left of': 'left', 'on the left side of': 'left',
+            'above': 'above',
+            'below': 'below'
+        }
+        if term in self.relation_space:
+            self.value = self.relation_space[term]
+        else:
+            return "Relation undefined in vocabulary"
 class ClevrDSL:
     def __init__(self, image_idx, scene_graph):
         self.this_scene = ClevrScene(scene_graph)

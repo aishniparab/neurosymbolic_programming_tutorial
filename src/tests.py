@@ -1,17 +1,18 @@
 """
 stopped working 02/21/2023 1:15pm
-need clevrobj dsl to init obj without having all the details about the obj
+#need clevrobj dsl to init obj without having all the details about the obj
 """
 
 import recursive_descent_parser as rdp
 
 # parser
 Parser = rdp.Parser()
-program = 'blue'
+program = 'left of '
 ast = Parser.parse(program)
 print(ast)
+print(ast['body']['value'].value)
 
-"""
+""" 
 # boolean type
 program1 = 'true'
 ast = Parser.parse(program1)
