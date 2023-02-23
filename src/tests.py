@@ -7,7 +7,7 @@ import recursive_descent_parser as rdp
 
 # parser
 Parser = rdp.Parser()
-program = 'left of '
+program = '    blue ball'
 ast = Parser.parse(program)
 print(ast)
 print(ast['body']['value'].value)

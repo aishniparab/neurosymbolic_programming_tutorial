@@ -1,10 +1,6 @@
 # recursive descent parser
 # https://www.youtube.com/watch?v=0ZDPvdp2uFk&list=PLGNbPb3dQJ_5FTPfFIg28UxuMpu7k0eT4&index=2
-
 import dsl
-import tokenizer
-
-
 class Parser:
     """
     Parses a program into an AST in json format
@@ -35,6 +31,7 @@ class Parser:
 
     def color(self):
         token = self._eat('Color')
+        print(token)
         return {
             'type': 'Color',
             'value': dsl.Color(token['value'])
@@ -118,4 +115,3 @@ class Parser:
             'type': 'Scene',
             'body': self.literal()
         }
-

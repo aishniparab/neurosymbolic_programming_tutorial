@@ -1,16 +1,35 @@
-#https://www.youtube.com/watch?v=0ZDPvdp2uFk&list=PLGNbPb3dQJ_5FTPfFIg28UxuMpu7k0eT4&index=2
-# stopped working on rdp and this file at 11:14pm 2/22
-# implemented single tokens for attributes
+# https://www.youtube.com/watch?v=0ZDPvdp2uFk&list=PLGNbPb3dQJ_5FTPfFIg28UxuMpu7k0eT4&index=2
+# stopped working on rdp and this file at 1:14pm 2/23
 # need to figure out how to parse a sentence like "blue ball"
 # then need to add more semantics to the sentence like "what is the size of the blue ball"
 # for neural one see nsvqa https://github.com/kexinyi/ns-vqa; https://github.com/nerdimite/neuro-symbolic-ai-soc/blob/master/semantic_parser.py
 
 # purpose of tokenizer is to extract a stream of token with some type and value
 
+# set of rules, values are regex expressions
+import re
+
+color_rule = re.compile('(blue|green|red|yellow|cyan|brown|purple|gray)')
+size_rule = re.compile('(large|big|small|tiny)')
+shape_rule = re.compile('(cube|sphere|box|cylinder|ball|block)')
+material_rule = re.compile('(matte|rubber|metallic|shiny)')
+relation_rule = re.compile('(front|\b[in front of]\b|behind|right|\b[right of]\b|\b[to the right of]\b|\b[on the '
+                           'right side of]\b|left|\b[left of]\b|\b[to the left side]\b|\b[on the right side '
+                           'of]\b|above|below)')
+whitespace_rule = re.compile('\s')
+
+spec = {
+    'Space': whitespace_rule,
+    'Color': color_rule,
+    'Size': size_rule,
+    'Shape': shape_rule,
+    'Material': material_rule,
+    'Relation': relation_rule
+}
 class Tokenizer:
     def __init__(self, input_string):
         self._string = input_string
-        self._position = 0 # track position of each character; characters are grouped into tokens
+        self._position = 0  # track position of each character; characters are grouped into tokens
 
     def has_more_tokens(self):
         """
@@ -18,6 +37,14 @@ class Tokenizer:
         :return: bool
         """
         return self._position < len(self._string)
+
+    def _match(self, regexp, input_string):
+        matched = re.search(regexp, input_string)
+        if matched is None:
+            return None
+        else:
+            self._position += len(matched.group())
+            return matched.group()
 
     def get_next_token(self):
         """
@@ -30,90 +57,38 @@ class Tokenizer:
         # recognize tokens
         current_string = self._string[self._position:] # return rest of the string starting at position
 
-        # recognize colors
-        if current_string[0:3] in ['blu', 'red', 'gre', 'yel', 'cya', 'pur', 'gra', 'bro']:
-            color = ''
-            # consume token
-            while current_string[self._position] != ' ':
-                color += current_string[self._position]
-                self._position += 1
-            return {
-                'type': 'Color',
-                'value': color
-            }
+        for token_type, regexp in spec.items():
+            token_value = self._match(regexp, current_string)
+            if token_value is None:
+                continue
+            # skip whitespace tokens
+            if token_type == 'Space':
+                return self.get_next_token()
+            else:
+                return {
+                    'type': token_type,
+                    'value': token_value
+                }
 
-        # recognize sizes
-        if current_string[0:3] in ['lar', 'big', 'sma', 'tin']:
-            size = ''
-            while current_string[self._position] != ' ':
-                size += current_string[self._position]
-                self._position += 1
-            return {
-                'type': 'Size',
-                'value': size
-            }
+        raise SyntaxError("Unexpected Token: {}".format(current_string[0]))
 
-        # recognize materials
-        if current_string[0:3] in ['mat', 'rub', 'met', 'shi']:
-            material = ''
-            while current_string[self._position] != ' ':
-                material += current_string[self._position]
-                self._position += 1
-            return {
-                'type': 'Material',
-                'value': material
-            }
-
-        # recognize shapes
-        if current_string[0:3] in ['cub', 'sph', 'blo', 'cyl', 'bal']:
-            shape = ''
-            while current_string[self._position] != ' ':
-                shape += current_string[self._position]
-                self._position += 1
-            return {
-                'type': 'Shape',
-                'value': shape
-            }
-
-        # recognize relations
-        if current_string[0:4] in ['fron', 'behi', 'righ', 'left', 'abov', 'belo', 'to t', 'on t', 'in f']:
-            relation = ''
-            # skip position to relation for special cases
-            if current_string[0:6] in ['to the', 'on the']: # to the <rel> of, on the <rel> of, in front of cases
-                self._position += len('to the ')
-            elif current_string[0:6] in ['in fro']: # in front of case
-                self._position += len('in ')
-
-            while current_string[self._position] != ' ': # parse atomic relation: left, right, front, behind, above, below
-                relation += current_string[self._position]
-                self._position += 1
-
-            # move position forward for special cases
-            if current_string[0:6] in ['to the', 'on the', 'in fro']: # to the <rel> of, on the <rel> of, in front of cases
-                self._position += len('of ')
-            if current_string[self._position+1:self._position+2] == ['of']: # right of, left of case
-                self._postion += len('of ')
-            return {
-                'type': 'Relation',
-                'value': relation
-            }
 
 # playing around below to check vocabulary statistics of the questions
-#tokenizer = Tokenizer("What is the size of the blue ball?")
-#tokenizer.get_next_token()
+# tokenizer = Tokenizer("What is the size of the blue ball?")
+# tokenizer.get_next_token()
 
 ### doing some checks here to see what kinds of tokens we need to eat
 
-#from spacy.tokenizer import Tokenizer
-#from spacy.lang.en import English
+# from spacy.tokenizer import Tokenizer
+# from spacy.lang.en import English
 
-#nlp = English()
+# nlp = English()
 
 # Create a blank Tokenizer with just the English vocab
-#tokenizer = Tokenizer(nlp.vocab)
-#tokens = tokenizer("What is the size of the blue ball?")
-#print(tokens)
-#for token in tokens:
+# tokenizer = Tokenizer(nlp.vocab)
+# tokens = tokenizer("What is the size of the blue ball?")
+# print(tokens)
+# for token in tokens:
 #    if token == "size":
 """
 import data
@@ -127,4 +102,3 @@ questions_df['question'].str.split().apply(unique_tokens.update)
 print(questions_df.head())
 print(unique_tokens)
 """
-
