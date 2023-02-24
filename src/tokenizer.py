@@ -1,7 +1,7 @@
 # https://www.youtube.com/watch?v=0ZDPvdp2uFk&list=PLGNbPb3dQJ_5FTPfFIg28UxuMpu7k0eT4&index=2
-# stopped working on rdp and this file at 1:14pm 2/23
-# need to figure out how to parse a sentence like "blue ball"
-# then need to add more semantics to the sentence like "what is the size of the blue ball"
+# stopped working on rdp and this file at 10:52pm 2/23
+# going through questions in the dataset to identify patterns manually in visualize_question_trees.py and adding comments here in rules
+# spacy has a library to parse sentence into a tree; can use that to map to AST
 # for neural one see nsvqa https://github.com/kexinyi/ns-vqa; https://github.com/nerdimite/neuro-symbolic-ai-soc/blob/master/semantic_parser.py
 
 # purpose of tokenizer is to extract a stream of token with some type and value
@@ -17,6 +17,42 @@ relation_rule = re.compile('(front|\b[in front of]\b|behind|right|\b[right of]\b
                            'right side of]\b|left|\b[left of]\b|\b[to the left side]\b|\b[on the right side '
                            'of]\b|above|below)')
 whitespace_rule = re.compile('\s')
+
+"""
+what_questions = {
+    'what number': count(objset??),
+    'what is': query(??),
+    'what material': query_material(obj??),
+    'what color': query_color(obj??),
+    'what shape': query_shape(obj??),
+    'what size': query_size(obj??)
+}
+
+how_questions = {
+    'how many' : count(objset??),
+    'how big' : query_size(obj??)
+}
+
+are_questions = {
+    'are there the same number': ,
+    'are any': exist(filter_attr(),
+    'are the <attr>':,
+    'are the object <rel>': # where <rel> is 'in front of', 'left of', 'that is in front of', 'that is left of', 'behind the' 
+}
+
+the_questions = {
+    'the object/thing': ,
+    'the <attr>': ,
+    'the other': 
+}
+"""
+# There questions
+# Is questions
+# How questions
+# Are questions
+# The questions
+# Do questions
+# Does questions
 
 spec = {
     'Space': whitespace_rule,
