@@ -30,7 +30,7 @@ what_questions = {
 
 how_questions = {
     'how many' : count(objset??),
-    'how big' : query_size(obj??)
+    'how big' : query_size(obj??) # check for "how small" and other possibilities
 }
 
 are_questions = {
@@ -107,34 +107,3 @@ class Tokenizer:
                 }
 
         raise SyntaxError("Unexpected Token: {}".format(current_string[0]))
-
-
-# playing around below to check vocabulary statistics of the questions
-# tokenizer = Tokenizer("What is the size of the blue ball?")
-# tokenizer.get_next_token()
-
-### doing some checks here to see what kinds of tokens we need to eat
-
-# from spacy.tokenizer import Tokenizer
-# from spacy.lang.en import English
-
-# nlp = English()
-
-# Create a blank Tokenizer with just the English vocab
-# tokenizer = Tokenizer(nlp.vocab)
-# tokens = tokenizer("What is the size of the blue ball?")
-# print(tokens)
-# for token in tokens:
-#    if token == "size":
-"""
-import data
-import pandas as pd
-
-questions_data = data.getQuestions('../datasets/CLEVR_sample_nscl/train/questions.json')
-questions_df = pd.DataFrame(questions_data)
-unique_tokens = set()
-questions_df['question'].str.split().apply(unique_tokens.update)
-
-print(questions_df.head())
-print(unique_tokens)
-"""
