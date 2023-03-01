@@ -32,7 +32,6 @@ class Parser:
 
     def color(self):
         token = self._eat('Color')
-        print(token)
         return {
             'type': 'Color',
             'value': dsl.Color(token['value'])
@@ -66,6 +65,13 @@ class Parser:
             'value': dsl.Relation(token['value'])
         }
 
+    def exists(self):
+        token = self._eat('Exists')
+        return {
+            'type': 'Exists',
+            'value': dsl.ClevrDSL.exist()
+        }
+
     def literal(self):
         if self._lookahead['type'] == 'Color':
             return self.color()
@@ -77,6 +83,8 @@ class Parser:
             return self.shape()
         elif self._lookahead['type'] == 'Relation':
             return self.relation()
+        elif self._lookahead['type'] == 'Exists':
+            return self.exists()
         else:
             return "Unexpected Literal"
 

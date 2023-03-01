@@ -7,7 +7,14 @@ import recursive_descent_parser as rdp
 
 # parser
 Parser = rdp.Parser()
-program = '    blue ball'
+program = 'What is the shape of the blue object?'
+scene_graph
+# {'type': query_shape, value: {type: filter, value: {'type': Color, value: Blue}}} ===> query_shape((filter(blue)) ==> "shape"
+# [query_shape(), filter(), blue]
+
+#program = 'block is blue'
+#program = 'object is shiny'
+#program = 'behind'
 ast = Parser.parse(program)
 print(ast)
 print(ast['body']['value'].value)
